@@ -7,6 +7,7 @@ from threading import Thread
 from socket import *
 
 from messageApp_view import Main_Window, Config_Window
+from messageApp_model import CommThread
 
 ###############################################################################################
 # Controller Class 
@@ -40,13 +41,16 @@ class Controller:
     # fetches the correct hostadress and activates the socket and thread to allow the communication
 
     def on_config_ok(self,event):
-        flag, hostaddress = self.config_window.on_config_ok()
-        if (flag == 2):
-            hostaddress = gethostname()
+        flag, IPaddress = self.config_window.on_config_ok()
+        
         if (flag != 1):
+            if (flag == 2):
+                hostname = gethostname()
+                IPaddress = gethostbyname(hostname)
+            
             self.config_window.Close()
+            self.thread= CommThread(IPaddress)
             pub.subscribe(self.receive_message, "incoming_message")
-            self.thread= CommThread(hostaddress)
             self.message_window.Show()
 
     ###############################################################################################
@@ -61,7 +65,10 @@ class Controller:
         self.message_window.own_text_add("<you> " + text + "\n")
         bytetext = bytes(text,'utf-8')
 
-        self.thread.client_conn.send(bytetext)
+        try: 
+            self.thread.client_conn.send(bytetext)
+        except AttributeError: 
+            self.message_window.received_text_add("<ERROR: No Connection>")
         self.message_window.own_text_clear_screen()
 
     ###############################################################################################

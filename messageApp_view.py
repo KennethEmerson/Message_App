@@ -53,6 +53,8 @@ class Config_Window(wx.Frame):
         if self.client_choice.GetValue():
             self.IP_txtbox.SetEditable(True)
 
+    ###############################################################################################
+
     def on_config_ok(self):
         if self.client_choice.GetValue():
             hostAddress = self.IP_txtbox.GetValue()

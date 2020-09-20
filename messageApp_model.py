@@ -3,25 +3,26 @@ from threading import Thread
 from socket import *
 
 ###############################################################################################
-# Contains the socket and thread logic for the app
+# class CommThread inherites from Thread and additional socket logic is added
 ###############################################################################################
 
 class CommThread(Thread):
 
-    def __init__(self):
+    def __init__(self,IP_adress):
         Thread.__init__(self)
-        Thread.daemon = True                        #stop thread after window closes
-        self.start()                                #start thread and applies method "Run"
+        Thread.daemon = True                        # stop thread after window closes
+        self.host = IP_adress                       # hostadress (own IP if server)
+        self.port = 13000                
+        self.start()                                #start thread and applies method "run"
 
 ###############################################################################################
 
-    def Run(self,hostaddress):
-
-        self.host = hostaddress
-        self.port = 13000
+    #override the standard run method of the thread
+    def run(self):  
         self.buf = 1024
         self.addr = (self.host, self.port)
         self.Socket = socket()
+        print("Server IP-adress: " + self.host)
         self.Socket.bind(self.addr)
         self.Socket.listen(5)
         print("Socket listening")
